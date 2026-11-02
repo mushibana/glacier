@@ -3,10 +3,18 @@ package io.github.mushibana.glacier.data
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+data class Task(val name: String, val orderNum: Int))
+
 interface DataRepository {
-  val data: Flow<List<String>>
+  val data: Flow<List<Task>>
 }
 
 class DefaultDataRepository : DataRepository {
-  override val data: Flow<List<String>> = flow { emit(listOf("Android")) }
+  override val data: Flow<List<Task>> = flow { emit(listOf(
+    Task("5th test task", 5 * 1024),
+    Task("4th test task", 4 * 1024),
+    Task("3rd test task", 3 * 1024),
+    Task("2nd test task", 2 * 1024),
+    Task("1st test task", 1 * 1024),
+  ).map {tasks -> tasks.sortedBy {it.orderNum} } ) }
 }

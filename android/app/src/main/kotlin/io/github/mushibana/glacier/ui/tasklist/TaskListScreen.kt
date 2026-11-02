@@ -25,17 +25,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import io.github.mushibana.glacier.R
 import io.github.mushibana.glacier.data.DefaultDataRepository
+import io.github.mushibana.glacier.data.Task
 import io.github.mushibana.glacier.ui.theme.GlacierTheme
 
 @Composable
-fun MainScreen(
+fun TaskListScreen(
   onItemClick: (NavKey) -> Unit,
   modifier: Modifier = Modifier,
-  viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
+  viewModel: TaskListScreenViewModel = viewModel { TaskListScreenViewModel(DefaultDataRepository()) },
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   when (val state = uiState) {
-    MainScreenUiState.Loading -> {
+    TaskListScreenUiState.Loading -> {
       Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -43,10 +44,10 @@ fun MainScreen(
         CircularProgressIndicator()
       }
     }
-    is MainScreenUiState.Success -> {
-      MainScreen(data = state.data, modifier = modifier)
+    is TaskListScreenUiState.Success -> {
+      TaskListScreen(data = state.data, modifier = modifier)
     }
-    is MainScreenUiState.Error -> {
+    is TaskListScreenUiState.Error -> {
       Text("Error loading data: ${state.throwable.message}")
     }
   }
@@ -54,7 +55,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
+internal fun TaskListScreen(data: List<Task>, modifier: Modifier = Modifier) {
   Scaffold(
     modifier = modifier,
     topBar = {
@@ -68,30 +69,19 @@ internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
     }
   ) { innerPadding ->
 
-    // App Content
-
     Column(
       modifier = Modifier.padding(innerPadding),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-      data.forEach { Greeting(it) }
-      Button(
-        modifier = Modifier.padding(24.dp, 24.dp),
-        onClick = { /* Button clicked */ }
-      ) {
-        Text("OK")
-      }
-
-      // TODO: Extend app UI with more Jetpack Compose UI elements here
-
+      data.forEach { TaskEntry(it) }
     }
   }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun TaskEntry(task: Task, modifier: Modifier = Modifier) {
   Text(
-    text = "Hello $name !",
+    text = "$task.name",
     modifier = modifier.padding(16.dp, 16.dp),
     style = MaterialTheme.typography.bodyLarge
   )
@@ -99,7 +89,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MainScreenPreview() {
-  GlacierTheme { MainScreen(listOf("Android")) }
+fun TaskListScreenPreview() {
+  GlacierTheme { TaskListScreen(listOf("Android")) }
 }
 

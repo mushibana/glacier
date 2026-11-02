@@ -8,19 +8,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import io.github.mushibana.glacier.ui.main.MainScreen
+import io.github.mushibana.glacier.ui.tasklist.TaskListScreen
 
 @Composable
 fun MainNavigation() {
-  val backStack = rememberNavBackStack(Main)
+  val backStack = rememberNavBackStack(TaskList)
 
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },
     entryProvider =
       entryProvider {
-        entry<Main> {
-          MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
+        entry<TaskList> {
+          TaskListScreen(onItemClick = { navKey -> backStack.add(navKey) })
         }
       },
   )
