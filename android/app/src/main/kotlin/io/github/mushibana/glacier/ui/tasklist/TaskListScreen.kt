@@ -1,4 +1,4 @@
-package io.github.mushibana.glacier.ui.main
+package io.github.mushibana.glacier.ui.tasklist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,66 +30,68 @@ import io.github.mushibana.glacier.ui.theme.GlacierTheme
 
 @Composable
 fun TaskListScreen(
-  onItemClick: (NavKey) -> Unit,
-  modifier: Modifier = Modifier,
-  viewModel: TaskListScreenViewModel = viewModel { TaskListScreenViewModel(DefaultDataRepository()) },
+    onItemClick: (NavKey) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TaskListScreenViewModel = viewModel { TaskListScreenViewModel(DefaultDataRepository()) },
 ) {
-  val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-  when (val state = uiState) {
-    TaskListScreenUiState.Loading -> {
-      Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-      ) {
-        CircularProgressIndicator()
-      }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    when (val state = uiState) {
+        TaskListScreenUiState.Loading -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is TaskListScreenUiState.Success -> {
+            TaskListScreen(data = state.data, modifier = modifier)
+        }
+
+        is TaskListScreenUiState.Error -> {
+            Text("Error loading data: ${state.throwable.message}")
+        }
     }
-    is TaskListScreenUiState.Success -> {
-      TaskListScreen(data = state.data, modifier = modifier)
-    }
-    is TaskListScreenUiState.Error -> {
-      Text("Error loading data: ${state.throwable.message}")
-    }
-  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TaskListScreen(data: List<Task>, modifier: Modifier = Modifier) {
-  Scaffold(
-    modifier = modifier,
-    topBar = {
-      CenterAlignedTopAppBar(
-        title = { Text(stringResource(R.string.app_name)) },
-        colors = TopAppBarDefaults.topAppBarColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
-          titleContentColor = MaterialTheme.colorScheme.primary
-        )
-      )
-    }
-  ) { innerPadding ->
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    ) { innerPadding ->
 
-    Column(
-      modifier = Modifier.padding(innerPadding),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-      data.forEach { TaskEntry(it) }
+        Column(
+            modifier = Modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            data.forEach { TaskEntry(it) }
+        }
     }
-  }
 }
 
 @Composable
 fun TaskEntry(task: Task, modifier: Modifier = Modifier) {
-  Text(
-    text = "$task.name",
-    modifier = modifier.padding(16.dp, 16.dp),
-    style = MaterialTheme.typography.bodyLarge
-  )
+    Text(
+        text = task.name,
+        modifier = modifier.padding(16.dp, 16.dp),
+        style = MaterialTheme.typography.bodyLarge
+    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TaskListScreenPreview() {
-  GlacierTheme { TaskListScreen(listOf("Android")) }
+    GlacierTheme { TaskListScreen(listOf(Task("Android", 1))) }
 }
 

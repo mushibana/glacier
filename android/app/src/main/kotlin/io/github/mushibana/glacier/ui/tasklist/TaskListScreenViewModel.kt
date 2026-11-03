@@ -1,7 +1,8 @@
-package io.github.mushibana.glacier.ui.main
+package io.github.mushibana.glacier.ui.tasklist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.mushibana.glacier.data.Task
 import io.github.mushibana.glacier.data.DataRepository
 import io.github.mushibana.glacier.ui.tasklist.TaskListScreenUiState.Success
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,17 +12,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class TaskListScreenViewModel(dataRepository: DataRepository) : ViewModel() {
-  val uiState: StateFlow<TaskListScreenUiState> =
-    dataRepository.data
-      .map<List<Task>, TaskListScreenUiState>(::Success)
-      .catch { emit(TaskListScreenUiState.Error(it)) }
-      .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskListScreenUiState.Loading)
+    val uiState: StateFlow<TaskListScreenUiState> =
+        dataRepository.data
+            .map<List<Task>, TaskListScreenUiState>(::Success)
+            .catch { emit(TaskListScreenUiState.Error(it)) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskListScreenUiState.Loading)
 }
 
 sealed interface TaskListScreenUiState {
-  object Loading : TaskListScreenUiState
+    object Loading : TaskListScreenUiState
 
-  data class Error(val throwable: Throwable) : TaskListScreenUiState
+    data class Error(val throwable: Throwable) : TaskListScreenUiState
 
-  data class Success(val data: List<String>) : TaskListScreenUiState
+    data class Success(val data: List<Task>) : TaskListScreenUiState
 }
