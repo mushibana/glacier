@@ -14,6 +14,10 @@ kotlin = "2.3.20"
 nav3Core = "1.0.1"
 lifecycleViewmodelNav3 = "2.10.0"
 reorderable = "3.1.0"
+protobuf = "4.36.2"
+protobufGradle = "0.10.1"
+grpc = "1.85.1"
+grpcKotlin = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -39,8 +43,17 @@ androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runt
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+# gRPC
+grpc-bom = { module = "io.grpc:grpc-bom", version.ref = "grpc" }
+grpc-okhttp = { module = "io.grpc:grpc-okhttp" }
+grpc-stub = { module = "io.grpc:grpc-stub" }
+grpc-protobuf-lite = { module = "io.grpc:grpc-protobuf-lite" }
+grpc-kotlin-stub = { module = "io.grpc:grpc-kotlin-stub", version.ref = "grpcKotlin" }
+# Protocol Buffers
+protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufGradle" }

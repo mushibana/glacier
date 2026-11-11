@@ -1,7 +1,10 @@
+import com.google.protobuf.gradle.proto
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.protobuf)
 }
 
 android {
@@ -37,6 +40,57 @@ android {
       excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
   }
+
+  sourceSets {
+    getByName("main") {
+        proto {
+            srcDir(rootProject.file("../proto"))
+        }
+    }
+  }
+}
+
+protobuf {
+    // Protobuf compiler
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+
+    // Additional protoc plugins
+    plugins {
+        // Generates Java gRPC service stubs
+        create("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:${libs.versions.grpc.get()}"
+        }
+
+        // Generates Kotlin coroutine-based service stubs
+        create("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:${libs.versions.grpcKotlin.get()}:jdk8@jar"
+        }
+    }
+
+    // Configure generation for every Android variant
+    generateProtoTasks {
+        all().configureEach {
+            // Protobuf messages
+            builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+
+            // gRPC service interfaces and Kotlin coroutine stubs
+            plugins {
+                create("grpc") {
+                    option("lite")
+                }
+
+                create("grpckt") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 kotlin {
@@ -84,4 +138,13 @@ dependencies {
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
   implementation(libs.reorderable)
+  // gRPC
+  implementation(platform(libs.grpc.bom))
+  implementation(libs.grpc.okhttp)
+  implementation(libs.grpc.stub)
+  implementation(libs.grpc.protobuf.lite)
+  implementation(libs.grpc.kotlin.stub)
+
+  // Protocol Buffers
+  implementation(libs.protobuf.javalite)
 }
