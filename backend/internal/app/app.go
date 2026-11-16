@@ -8,7 +8,9 @@ import (
 	"net"
 
 	"github.com/mushibana/glacier/backend/internal/config"
+	"github.com/mushibana/glacier/backend/internal/repository/sqlite"
 	sqliteDB "github.com/mushibana/glacier/backend/internal/repository/sqlite"
+	"github.com/mushibana/glacier/backend/internal/service"
 	grpcTransport "github.com/mushibana/glacier/backend/internal/transport/grpc"
 )
 
@@ -25,8 +27,8 @@ func New(cfg config.Config, logger *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("initialize database: %w", err)
 	}
 
-	// Initialize repositories.
-	// Initialize application services.
+	taskRepo := sqlite.NewTaskRepositoryImplementation(db)
+	taskService := service.NewTaskServiceImplementation(taskRepo)
 	// Initialize gRPC server.
 
 	grpcServer := grpcTransport.NewServer()

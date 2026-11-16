@@ -17,8 +17,9 @@ message Task {
 }
 
 service Tasks {
-  rpc GetTasks(GetTasksRequest) returns (GetTasksResponse) {}
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {}
   rpc CreateTask(CreateTaskRequest) returns (Task) {}
+  rpc GetTask(GetTaskRequest) returns (Task) {}
   rpc UpdateTask(UpdateTaskRequest) returns (Task) {}
   rpc DeleteTask(DeleteTaskRequest) returns (google.protobuf.Empty) {}
   rpc MoveTask(MoveTaskRequest) returns (MoveTaskResponse) {}
@@ -26,10 +27,14 @@ service Tasks {
 
 // requests
 
-message GetTasksRequest {}
+message ListTasksRequest {}
 
 message CreateTaskRequest {
   string name = 1;
+}
+
+message GetTaskRequest {
+  string id = 1;
 }
 
 message UpdateTaskRequest {
@@ -48,8 +53,14 @@ message MoveTaskRequest {
 
 // responses
 
-message GetTasksResponse {
-  repeated Task tasks = 1;
+message ListTasksResponse {
+  message ListTaskEntry {
+    int64 id = 1;
+    string name = 2;
+    int64 order_num = 3;
+  }
+
+  repeated ListTaskEntry tasks = 1;
 }
 
 message MoveTaskResponse {

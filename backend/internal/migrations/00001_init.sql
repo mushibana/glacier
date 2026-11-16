@@ -19,7 +19,7 @@ CREATE TABLE tasks (
   stream_id INTEGER,
   start_datetime TEXT,
   deadline_datetime TEXT,
-  timelimit TEXT,
+  timelimit INTEGER NOT NULL DEFAULT 0,
   is_onetime BOOLEAN NOT NULL DEFAULT FALSE,
   repeatable BOOLEAN NOT NULL DEFAULT FALSE,
   finished BOOLEAN NOT NULL DEFAULT FALSE,
