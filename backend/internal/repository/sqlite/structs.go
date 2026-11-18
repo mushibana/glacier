@@ -13,15 +13,15 @@ type tasksRow struct {
 	ParentID sql.NullInt64
 	OrderNum int64
 
-	Name             string
-	Description      sql.NullString
-	StreamID         sql.NullInt64
-	StartDateTime    sql.NullString
-	DeadlineDateTime sql.NullString
-	TimeLimit        int64
-	IsOnetime        bool
-	Repeatable       bool
-	Finished         bool
+	Name        string
+	Description sql.NullString
+	StreamID    sql.NullInt64
+	StartAt     sql.NullString
+	DeadlineAt  sql.NullString
+	TimeLimit   int64
+	IsOnetime   bool
+	Repeatable  bool
+	Finished    bool
 
 	CreatedAt sql.NullString
 	UpdatedAt sql.NullString
@@ -43,13 +43,13 @@ func toDomain(r tasksRow) (domain.Task, error) {
 
 	var err error
 
-	t.StartDateTime, err = fromNullableTime(r.StartDateTime, time.RFC3339)
+	t.StartAt, err = fromNullableTime(r.StartAt, time.RFC3339)
 	if err != nil {
-		return domain.Task{}, fmt.Errorf("parse StartDateTime: %w", err)
+		return domain.Task{}, fmt.Errorf("parse StartAt: %w", err)
 	}
-	t.DeadlineDateTime, err = fromNullableTime(r.DeadlineDateTime, time.RFC3339)
+	t.DeadlineAt, err = fromNullableTime(r.DeadlineAt, time.RFC3339)
 	if err != nil {
-		return domain.Task{}, fmt.Errorf("parse DeadlineDateTime: %w", err)
+		return domain.Task{}, fmt.Errorf("parse DeadlineAt: %w", err)
 	}
 	t.CreatedAt, err = fromNullableTime(r.CreatedAt, time.RFC3339)
 	if err != nil {
@@ -65,20 +65,20 @@ func toDomain(r tasksRow) (domain.Task, error) {
 
 func fromDomain(t domain.Task) (tasksRow, error) {
 	r := tasksRow{
-		ID:               t.ID,
-		ParentID:         toNullInt64FromPointer(t.ParentID),
-		OrderNum:         t.OrderNum,
-		Name:             t.Name,
-		Description:      toNullString(t.Description),
-		StreamID:         toNullInt64FromPointer(t.StreamID),
-		StartDateTime:    toNullTime(t.StartDateTime, time.RFC3339),
-		DeadlineDateTime: toNullTime(t.DeadlineDateTime, time.RFC3339),
-		TimeLimit:        t.TimeLimit,
-		IsOnetime:        t.IsOnetime,
-		Repeatable:       t.Repeatable,
-		Finished:         t.Finished,
-		CreatedAt:        toNullTime(t.CreatedAt, time.RFC3339),
-		UpdatedAt:        toNullTime(t.UpdatedAt, time.RFC3339),
+		ID:          t.ID,
+		ParentID:    toNullInt64FromPointer(t.ParentID),
+		OrderNum:    t.OrderNum,
+		Name:        t.Name,
+		Description: toNullString(t.Description),
+		StreamID:    toNullInt64FromPointer(t.StreamID),
+		StartAt:     toNullTime(t.StartAt, time.RFC3339),
+		DeadlineAt:  toNullTime(t.DeadlineAt, time.RFC3339),
+		TimeLimit:   t.TimeLimit,
+		IsOnetime:   t.IsOnetime,
+		Repeatable:  t.Repeatable,
+		Finished:    t.Finished,
+		CreatedAt:   toNullTime(t.CreatedAt, time.RFC3339),
+		UpdatedAt:   toNullTime(t.UpdatedAt, time.RFC3339),
 	}
 
 	return r, nil

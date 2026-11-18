@@ -24,26 +24,26 @@ func NewTaskServiceImplementation(taskRepo repository.TaskRepository) TaskServic
 	return TaskServiceImplementation{tasks: taskRepo}
 }
 
-func (s TaskServiceImplementation) List(ctx context.Context) ([]domain.Task, error) {
+func (s *TaskServiceImplementation) List(ctx context.Context) ([]domain.Task, error) {
 	return s.tasks.List(ctx)
 }
 
-func (s TaskServiceImplementation) Get(ctx context.Context, id int64) (domain.Task, error) {
+func (s *TaskServiceImplementation) Get(ctx context.Context, id int64) (domain.Task, error) {
 	return s.tasks.Get(ctx, id)
 }
 
-func (s TaskServiceImplementation) Create(ctx context.Context, task domain.Task) (domain.Task, error) {
+func (s *TaskServiceImplementation) Create(ctx context.Context, task domain.Task) (domain.Task, error) {
 	return s.tasks.Create(ctx, task)
 }
 
-func (s TaskServiceImplementation) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
+func (s *TaskServiceImplementation) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
 	return s.tasks.Update(ctx, task)
 }
 
-func (s TaskServiceImplementation) Delete(ctx context.Context, id int64) error {
+func (s *TaskServiceImplementation) Delete(ctx context.Context, id int64) error {
 	return s.tasks.Delete(ctx, id)
 }
 
-func (s TaskServiceImplementation) Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error) {
+func (s *TaskServiceImplementation) Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error) {
 	return s.tasks.Move(ctx, id, beforeID)
 }

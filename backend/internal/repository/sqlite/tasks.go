@@ -17,7 +17,7 @@ func NewTaskRepositoryImplementation(db *sql.DB) TaskRepositoryImplementation {
 	return TaskRepositoryImplementation{db: db}
 }
 
-func (r TaskRepositoryImplementation) List(ctx context.Context) ([]domain.Task, error) {
+func (r *TaskRepositoryImplementation) List(ctx context.Context) ([]domain.Task, error) {
 	const query = `
 select 
 	id,
@@ -70,7 +70,7 @@ order by order_num`
 	return tasks, nil
 }
 
-func (r TaskRepositoryImplementation) Get(ctx context.Context, id int64) (domain.Task, error) {
+func (r *TaskRepositoryImplementation) Get(ctx context.Context, id int64) (domain.Task, error) {
 	const query = `
 select 
 	id,
@@ -79,8 +79,8 @@ select
 	name,
 	description,
 	stream_id,
-	start_datetime,
-	deadline_datetime,
+	start_at,
+	deadline_at,
 	timelimit,
 	is_onetime,
 	repeatable,
@@ -98,8 +98,8 @@ where deleted_at is null and id = ?`
 		&i.Name,
 		&i.Description,
 		&i.StreamID,
-		&i.StartDateTime,
-		&i.DeadlineDateTime,
+		&i.StartAt,
+		&i.DeadlineAt,
 		&i.TimeLimit,
 		&i.IsOnetime,
 		&i.Repeatable,
@@ -118,7 +118,7 @@ where deleted_at is null and id = ?`
 	return task, nil
 }
 
-func (r TaskRepositoryImplementation) Create(ctx context.Context, task domain.Task) (domain.Task, error) {
+func (r *TaskRepositoryImplementation) Create(ctx context.Context, task domain.Task) (domain.Task, error) {
 	const query = `
 insert into tasks(
 	parent_id,
@@ -126,8 +126,8 @@ insert into tasks(
 	name,
 	description,
   	stream_id,
-  	start_datetime,
-  	deadline_datetime,
+	start_at,
+	deadline_at,
   	timelimit,
   	is_onetime,
   	repeatable,
@@ -148,8 +148,8 @@ insert into tasks(
 		t.Name,
 		t.Description,
 		t.StreamID,
-		t.StartDateTime,
-		t.DeadlineDateTime,
+		t.StartAt,
+		t.DeadlineAt,
 		t.TimeLimit,
 		t.IsOnetime,
 		t.Repeatable,
@@ -163,10 +163,10 @@ insert into tasks(
 	return task, nil
 }
 
-// func (r TaskRepositoryImplementation) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
+// func (r *TaskRepositoryImplementation) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
 // }
 
-func (r TaskRepositoryImplementation) Delete(ctx context.Context, id int64) error {
+func (r *TaskRepositoryImplementation) Delete(ctx context.Context, id int64) error {
 	const query = `update tasks set deleted_at = date('now', 'localtime') where id = ?`
 
 	result, err := r.db.ExecContext(ctx, query, id)
@@ -184,5 +184,5 @@ func (r TaskRepositoryImplementation) Delete(ctx context.Context, id int64) erro
 	return nil
 }
 
-// func (r TaskRepositoryImplementation) Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error) {
+// func (r *TaskRepositoryImplementation) Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error) {
 // }
