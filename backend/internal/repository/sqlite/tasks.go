@@ -173,9 +173,9 @@ func (r *TaskRepositoryImplementation) Update(ctx context.Context, task domain.U
 }
 
 func (r *TaskRepositoryImplementation) Delete(ctx context.Context, id int64) error {
-	const query = `update tasks set deleted_at = date('now', 'localtime') where id = ?`
+	const query = `update tasks set deleted_at = ? where id = ?`
 
-	result, err := r.db.ExecContext(ctx, query, id)
+	result, err := r.db.ExecContext(ctx, query, time.Now().Format(time.RFC3339), id)
 	if err != nil {
 		return fmt.Errorf("query delete task: %w", err)
 	}
