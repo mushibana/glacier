@@ -163,8 +163,14 @@ insert into tasks(
 	return task, nil
 }
 
-// func (r *TaskRepositoryImplementation) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
-// }
+func (r *TaskRepositoryImplementation) Update(ctx context.Context, task domain.UpdateTaskParams) (domain.Task, error) {
+	if task.ID <= 0 {
+		return domain.Task{}, domain.ErrNotFound //TODO: change to invalidParam
+	}
+
+	// TODO:
+	return domain.Task{}, nil
+}
 
 func (r *TaskRepositoryImplementation) Delete(ctx context.Context, id int64) error {
 	const query = `update tasks set deleted_at = date('now', 'localtime') where id = ?`

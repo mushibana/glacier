@@ -11,7 +11,7 @@ type TaskService interface {
 	List(ctx context.Context) ([]domain.Task, error)
 	Get(ctx context.Context, id int64) (domain.Task, error)
 	Create(ctx context.Context, task domain.Task) (domain.Task, error)
-	Update(ctx context.Context, task domain.Task) (domain.Task, error)
+	Update(ctx context.Context, task domain.UpdateTaskParams) (domain.Task, error)
 	Delete(ctx context.Context, id int64) error
 	Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error)
 }
@@ -36,8 +36,8 @@ func (s *TaskServiceImplementation) Create(ctx context.Context, task domain.Task
 	return s.tasks.Create(ctx, task)
 }
 
-func (s *TaskServiceImplementation) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
-	return s.tasks.Update(ctx, task)
+func (s *TaskServiceImplementation) Update(ctx context.Context, params domain.UpdateTaskParams) (domain.Task, error) {
+	return s.tasks.Update(ctx, params)
 }
 
 func (s *TaskServiceImplementation) Delete(ctx context.Context, id int64) error {
