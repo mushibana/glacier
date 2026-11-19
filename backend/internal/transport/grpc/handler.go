@@ -48,13 +48,24 @@ func (h *TaskHandler) UpdateTask(ctx context.Context, r *pb.UpdateTaskRequest) (
 		case "description":
 			params.Description = domain.SetOptional(r.GetTask().GetDescription())
 		case "stream_id":
-			params.StreamID = domain.SetOptional(r.GetTask().GetStreamID())
+			streamID := r.GetTask().GetStreamId()
+			if streamID == 0 {
+				params.StreamID = domain.Optional[*int64]{Set: true, Value: nil}
+			} else {
+				params.StreamID = domain.SetOptional(&streamID)
+			}
 		case "start_at":
-			params.StartAt = domain.SetOptional(r.GetTask().GetStartAt())
+			if err := r.GetTask().GetStartAt().CheckValid(); err != nil {
+				return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("start at timestamp is not valid: %v", err))
+			}
+			params.StartAt = domain.SetOptional(r.GetTask().GetStartAt().AsTime())
 		case "deadline_at":
-			params.DeadlineAt = domain.SetOptional(r.GetTask().GetDeadlineAt())
+			if err := r.GetTask().GetDeadlineAt().CheckValid(); err != nil {
+				return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("deadline at timestamp is not valid: %v", err))
+			}
+			params.DeadlineAt = domain.SetOptional(r.GetTask().GetDeadlineAt().AsTime())
 		case "timelimit":
-			params.TimeLimit = domain.SetOptional(r.GetTask().GetTimeLimit())
+			params.TimeLimit = domain.SetOptional(r.GetTask().GetTimelimit())
 		case "is_onetime":
 			params.IsOnetime = domain.SetOptional(r.GetTask().GetIsOnetime())
 		case "repeatable":
