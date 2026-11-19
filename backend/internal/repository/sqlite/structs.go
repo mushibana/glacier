@@ -18,7 +18,7 @@ type tasksRow struct {
 	StreamID    sql.NullInt64
 	StartAt     sql.NullString
 	DeadlineAt  sql.NullString
-	TimeLimit   int64
+	Timelimit   int64
 	IsOnetime   bool
 	Repeatable  bool
 	Finished    bool
@@ -35,7 +35,7 @@ func toDomain(r tasksRow) (domain.Task, error) {
 		Name:        r.Name,
 		Description: r.Description.String,
 		StreamID:    fromNullableInt64ToPointer(r.StreamID),
-		TimeLimit:   r.TimeLimit,
+		Timelimit:   r.Timelimit,
 		IsOnetime:   r.IsOnetime,
 		Repeatable:  r.Repeatable,
 		Finished:    r.Finished,
@@ -63,8 +63,8 @@ func toDomain(r tasksRow) (domain.Task, error) {
 	return t, nil
 }
 
-func fromDomain(t domain.Task) (tasksRow, error) {
-	r := tasksRow{
+func fromDomain(t domain.Task) tasksRow {
+	return tasksRow{
 		ID:          t.ID,
 		ParentID:    toNullInt64FromPointer(t.ParentID),
 		OrderNum:    t.OrderNum,
@@ -73,13 +73,11 @@ func fromDomain(t domain.Task) (tasksRow, error) {
 		StreamID:    toNullInt64FromPointer(t.StreamID),
 		StartAt:     toNullTime(t.StartAt, time.RFC3339),
 		DeadlineAt:  toNullTime(t.DeadlineAt, time.RFC3339),
-		TimeLimit:   t.TimeLimit,
+		Timelimit:   t.Timelimit,
 		IsOnetime:   t.IsOnetime,
 		Repeatable:  t.Repeatable,
 		Finished:    t.Finished,
 		CreatedAt:   toNullTime(t.CreatedAt, time.RFC3339),
 		UpdatedAt:   toNullTime(t.UpdatedAt, time.RFC3339),
 	}
-
-	return r, nil
 }

@@ -100,7 +100,7 @@ where deleted_at is null and id = ?`
 		&i.StreamID,
 		&i.StartAt,
 		&i.DeadlineAt,
-		&i.TimeLimit,
+		&i.Timelimit,
 		&i.IsOnetime,
 		&i.Repeatable,
 		&i.Finished,
@@ -137,12 +137,9 @@ insert into tasks(
 	?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 ) returning id`
 
-	t, err := fromDomain(task)
-	if err != nil {
-		return domain.Task{}, fmt.Errorf("convert from task domain: %w", err)
-	}
+	t := fromDomain(task)
 
-	err = r.db.QueryRowContext(ctx, query,
+	err := r.db.QueryRowContext(ctx, query,
 		t.ParentID,
 		t.OrderNum,
 		t.Name,
@@ -150,7 +147,7 @@ insert into tasks(
 		t.StreamID,
 		t.StartAt,
 		t.DeadlineAt,
-		t.TimeLimit,
+		t.Timelimit,
 		t.IsOnetime,
 		t.Repeatable,
 		t.Finished,

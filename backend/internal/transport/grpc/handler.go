@@ -65,7 +65,7 @@ func (h *TaskHandler) UpdateTask(ctx context.Context, r *pb.UpdateTaskRequest) (
 			}
 			params.DeadlineAt = domain.SetOptional(r.GetTask().GetDeadlineAt().AsTime())
 		case "timelimit":
-			params.TimeLimit = domain.SetOptional(r.GetTask().GetTimelimit())
+			params.Timelimit = domain.SetOptional(r.GetTask().GetTimelimit())
 		case "is_onetime":
 			params.IsOnetime = domain.SetOptional(r.GetTask().GetIsOnetime())
 		case "repeatable":

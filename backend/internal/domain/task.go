@@ -12,7 +12,7 @@ type Task struct {
 	StreamID    *int64
 	StartAt     time.Time
 	DeadlineAt  time.Time
-	TimeLimit   int64
+	Timelimit   int64
 	IsOnetime   bool
 	Repeatable  bool
 	Finished    bool
@@ -29,7 +29,7 @@ type UpdateTaskParams struct {
 	StreamID    Optional[*int64]
 	StartAt     Optional[time.Time]
 	DeadlineAt  Optional[time.Time]
-	TimeLimit   Optional[int64]
+	Timelimit   Optional[int64]
 	IsOnetime   Optional[bool]
 	Repeatable  Optional[bool]
 	Finished    Optional[bool]
