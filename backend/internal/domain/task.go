@@ -2,6 +2,8 @@ package domain
 
 import "time"
 
+const OrderNumDefaultSpace int64 = 1024
+
 type Task struct {
 	ID       int64
 	ParentID *int64

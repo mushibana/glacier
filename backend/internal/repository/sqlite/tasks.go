@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/mushibana/glacier/backend/internal/domain"
@@ -22,12 +23,8 @@ func (r *TaskRepositoryImplementation) List(ctx context.Context) ([]domain.Task,
 select 
 	id,
 	parent_id,
-	order_num,
 	name,
-	stream_id,
-	is_onetime,
-	repeatable,
-	finished
+	order_num
 from tasks
 where deleted_at is null
 order by order_num`
@@ -45,12 +42,8 @@ order by order_num`
 		if err = rows.Scan(
 			&i.ID,
 			&i.ParentID,
-			&i.OrderNum,
 			&i.Name,
-			&i.StreamID,
-			&i.IsOnetime,
-			&i.Repeatable,
-			&i.Finished,
+			&i.OrderNum,
 		); err != nil {
 			return nil, fmt.Errorf("scan to tasksRow: %w", err)
 		}
@@ -245,5 +238,77 @@ func (r *TaskRepositoryImplementation) Delete(ctx context.Context, id int64) err
 	return nil
 }
 
-// func (r *TaskRepositoryImplementation) Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error) {
-// }
+func (r *TaskRepositoryImplementation) Move(ctx context.Context, id int64, beforeID *int64) ([]domain.Task, error) {
+	tasks, err := r.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get list of tasks: %w", err)
+	}
+
+	sortTasksFn := func(a, b domain.Task) int {
+		if a.OrderNum < b.OrderNum {
+			return -1
+		} else if a.OrderNum == b.OrderNum {
+			return 0
+		} else {
+			return 1
+		}
+	}
+
+	slices.SortFunc(tasks, sortTasksFn)
+
+	// before always should be initialized as -1, so "to = before + 1" in any case either beforeID is nil or not
+	from, before := -1, -1
+	for i, task := range tasks {
+		if beforeID != nil && task.ID == *beforeID {
+			before = i
+		}
+		if task.ID == id {
+			from = i
+		}
+
+		if from != -1 && (beforeID == nil || before != -1) {
+			break
+		}
+	}
+
+	// moved to end of list
+	if before == len(tasks)-1 {
+		tasks[from].OrderNum = tasks[before].OrderNum + domain.OrderNumDefaultSpace
+		slices.SortStableFunc(tasks, sortTasksFn)
+		return tasks, nil
+	}
+
+	to := before + 1
+
+	moved := tasks[from]
+	if from < to {
+		// move task from left to right => shifting list to the left
+		copy(tasks[from:to], tasks[from+1:to+1])
+	} else {
+		// move task from right to left => shifting list to the right
+		copy(tasks[to+1:from+1], tasks[to:from])
+	}
+	tasks[to] = moved
+
+	prevOrderNum := int64(0)
+	nextOrderNum := tasks[len(tasks)-1].OrderNum + domain.OrderNumDefaultSpace
+	if to-1 >= 0 {
+		prevOrderNum = tasks[to-1].OrderNum
+	}
+	if to+1 <= len(tasks)-1 {
+		nextOrderNum = tasks[to+1].OrderNum
+	}
+
+	tasks[to].OrderNum = prevOrderNum + (nextOrderNum-prevOrderNum)/2
+	if prevOrderNum < tasks[to].OrderNum && nextOrderNum < tasks[to].OrderNum {
+		return tasks, nil
+	}
+
+	// branch when integer nums between neighbours are exhausted (new order number is already in use)
+	// so rebalance is required
+	for i := range tasks {
+		tasks[i].OrderNum = int64(i) * domain.OrderNumDefaultSpace
+	}
+
+	return tasks, nil
+}
