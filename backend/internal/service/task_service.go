@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/mushibana/glacier/backend/internal/domain"
 	"github.com/mushibana/glacier/backend/internal/repository"
@@ -36,7 +37,7 @@ func (s *TaskServiceImplementation) Create(ctx context.Context, task domain.Task
 	return s.tasks.Create(ctx, task)
 }
 
-func (s *TaskServiceImplementation) Update(ctx context.Context, params domain.UpdateTaskParams) (domain.Task, error) {
+func (s *TaskServiceImplementation) Update(ctx context.Context, params domain.UpdateTaskParams) (time.Time, error) {
 	return s.tasks.Update(ctx, params)
 }
 

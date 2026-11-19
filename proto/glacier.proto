@@ -18,7 +18,7 @@ service Tasks {
   rpc ListTasks(google.protobuf.Empty) returns (ListTasksResponse) {}
   rpc CreateTask(CreateTaskRequest) returns (Task) {}
   rpc GetTask(GetTaskRequest) returns (Task) {}
-  rpc UpdateTask(UpdateTaskRequest) returns (Task) {}
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {}
   rpc DeleteTask(DeleteTaskRequest) returns (google.protobuf.Empty) {}
   rpc MoveTask(MoveTaskRequest) returns (MoveTaskResponse) {}
 }
@@ -38,7 +38,7 @@ message Task {
   optional bool is_onetime = 9;
   optional bool repeatable = 10;
   optional bool finished = 11;
-  optional google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp created_at = 12;
   optional google.protobuf.Timestamp updated_at = 13;
 }
 
@@ -81,6 +81,11 @@ message MoveTaskRequest {
 
 message ListTasksResponse {
   repeated ListTaskEntry tasks = 1;
+}
+
+message UpdateTaskResponse {
+  int64 id = 1;
+  google.protobuf.Timestamp updated_at = 2;
 }
 
 message MoveTaskResponse {

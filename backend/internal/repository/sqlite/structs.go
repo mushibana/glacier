@@ -81,3 +81,19 @@ func fromDomain(t domain.Task) tasksRow {
 		UpdatedAt:   toNullTime(t.UpdatedAt, time.RFC3339),
 	}
 }
+
+func fromUpdateTaskParams(t domain.UpdateTaskParams) tasksRow {
+	return tasksRow{
+		ID:          t.ID,
+		ParentID:    toNullInt64FromPointer(t.ParentID.Value),
+		Name:        t.Name.Value,
+		Description: toNullString(t.Description.Value),
+		StreamID:    toNullInt64FromPointer(t.StreamID.Value),
+		StartAt:     toNullTime(t.StartAt.Value, time.RFC3339),
+		DeadlineAt:  toNullTime(t.DeadlineAt.Value, time.RFC3339),
+		Timelimit:   t.Timelimit.Value,
+		IsOnetime:   t.IsOnetime.Value,
+		Repeatable:  t.Repeatable.Value,
+		Finished:    t.Finished.Value,
+	}
+}

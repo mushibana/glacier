@@ -160,13 +160,71 @@ insert into tasks(
 	return task, nil
 }
 
-func (r *TaskRepositoryImplementation) Update(ctx context.Context, task domain.UpdateTaskParams) (domain.Task, error) {
-	if task.ID <= 0 {
-		return domain.Task{}, domain.ErrNotFound //TODO: change to invalidParam
+func (r *TaskRepositoryImplementation) Update(ctx context.Context, params domain.UpdateTaskParams) (time.Time, error) {
+	if params.ID <= 0 {
+		return time.Time{}, domain.ErrInvalidParam("id")
 	}
 
-	// TODO:
-	return domain.Task{}, nil
+	taskRow := fromUpdateTaskParams(params)
+	var updateFieldsStr string
+	args := make([]any, 0)
+
+	switch {
+	case params.ParentID.Set:
+		updateFieldsStr += "parent_id = ?, "
+		args = append(args, taskRow.ParentID)
+	case params.Name.Set:
+		if params.Name.Value == "" {
+			return time.Time{}, domain.ErrInvalidParam("name")
+		}
+		updateFieldsStr += "name = ?, "
+		args = append(args, taskRow.Name)
+	case params.Description.Set:
+		updateFieldsStr += "description = ?, "
+		args = append(args, taskRow.Description)
+	case params.StreamID.Set:
+		updateFieldsStr += "stream_id = ?, "
+		args = append(args, taskRow.StreamID)
+	case params.StartAt.Set:
+		updateFieldsStr += "start_at = ?, "
+		args = append(args, taskRow.StartAt)
+	case params.DeadlineAt.Set:
+		updateFieldsStr += "deadline_at = ?, "
+		args = append(args, taskRow.DeadlineAt)
+	case params.Timelimit.Set:
+		updateFieldsStr += "timelimit = ?, "
+		args = append(args, taskRow.Timelimit)
+	case params.IsOnetime.Set:
+		updateFieldsStr += "is_onetime = ?, "
+		args = append(args, taskRow.IsOnetime)
+	case params.Repeatable.Set:
+		updateFieldsStr += "repeatable = ?, "
+		args = append(args, taskRow.Repeatable)
+	case params.Finished.Set:
+		updateFieldsStr += "finished = ?, "
+		args = append(args, taskRow.Finished)
+	}
+
+	if updateFieldsStr == "" || len(args) == 0 {
+		return time.Time{}, domain.ErrNoUpdateParams
+	}
+	updatedAt := time.Now()
+	args = append(args, updatedAt.Format(time.RFC3339), params.ID)
+	query := fmt.Sprintf("update tasks set %s updated_at = ? where id = ?", updateFieldsStr)
+
+	result, err := r.db.ExecContext(ctx, query, args)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("query update task, scan: %w", err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return time.Time{}, fmt.Errorf("get affected rows: %w", err)
+	}
+	if rowsAffected == 0 {
+		return time.Time{}, domain.ErrNotFound
+	}
+
+	return updatedAt, nil
 }
 
 func (r *TaskRepositoryImplementation) Delete(ctx context.Context, id int64) error {
