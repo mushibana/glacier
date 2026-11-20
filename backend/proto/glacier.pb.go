@@ -294,7 +294,7 @@ func (x *CreateTaskRequest) GetStreamId() int64 {
 
 type GetTaskRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -329,11 +329,11 @@ func (*GetTaskRequest) Descriptor() ([]byte, []int) {
 	return file_glacier_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetTaskRequest) GetId() string {
+func (x *GetTaskRequest) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 type UpdateTaskRequest struct {
@@ -679,7 +679,7 @@ const file_glacier_proto_rawDesc = "" +
 	"\n" +
 	"_stream_id\" \n" +
 	"\x0eGetTaskRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"s\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"s\n" +
 	"\x11UpdateTaskRequest\x12!\n" +
 	"\x04task\x18\x01 \x01(\v2\r.glacier.TaskR\x04task\x12;\n" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
