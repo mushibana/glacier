@@ -1,5 +1,8 @@
 package io.github.mushibana.glacier.ui.tasklist
 
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -104,6 +107,7 @@ private fun reorderTasks(tasks: List<Task>, from: LazyListItemInfo, to: LazyList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TaskListScreen(list: List<Task>, modifier: Modifier = Modifier) {
+    val haptic = LocalHapticFeedback.current
     var tasks by remember { mutableStateOf(list) }
 
     val lazyListState = rememberLazyListState()
@@ -134,7 +138,7 @@ internal fun TaskListScreen(list: List<Task>, modifier: Modifier = Modifier) {
             ) {
                 items(items = tasks, key = { it.id }) { task ->
                     ReorderableItem(state = reorderableLazyListState, key = task.id) { isDragging ->
-                        TaskItem(task, isDragging, scope = this)
+                        TaskItem(task, isDragging, haptic, scope = this)
                     }
                 }
             }
@@ -143,16 +147,23 @@ internal fun TaskListScreen(list: List<Task>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TaskItem(task: Task, isDragging: Boolean, scope: ReorderableCollectionItemScope) {
+fun TaskItem(
+    task: Task,
+    isDragging: Boolean,
+    haptic: HapticFeedback,
+    scope: ReorderableCollectionItemScope
+) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
             modifier = with(scope) {
-                //TODO: return longPress
-                // Modifier.longPressDraggableHandle()
-                Modifier.draggableHandle()
+                Modifier.longPressDraggableHandle(
+                    onDragStarted = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                )
             },
             onClick = {},
         ) {
