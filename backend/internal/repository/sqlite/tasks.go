@@ -14,8 +14,8 @@ type TaskRepositoryImplementation struct {
 	db *sql.DB
 }
 
-func NewTaskRepositoryImplementation(db *sql.DB) TaskRepositoryImplementation {
-	return TaskRepositoryImplementation{db: db}
+func NewTaskRepositoryImplementation(db *sql.DB) *TaskRepositoryImplementation {
+	return &TaskRepositoryImplementation{db: db}
 }
 
 func (r *TaskRepositoryImplementation) List(ctx context.Context) ([]domain.Task, error) {

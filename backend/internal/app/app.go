@@ -11,6 +11,7 @@ import (
 	"github.com/mushibana/glacier/backend/internal/repository/sqlite"
 	sqliteDB "github.com/mushibana/glacier/backend/internal/repository/sqlite"
 	"github.com/mushibana/glacier/backend/internal/service"
+	"github.com/mushibana/glacier/backend/internal/transport/grpc"
 	grpcTransport "github.com/mushibana/glacier/backend/internal/transport/grpc"
 )
 
@@ -29,9 +30,8 @@ func New(cfg config.Config, logger *slog.Logger) (*App, error) {
 
 	taskRepo := sqlite.NewTaskRepositoryImplementation(db)
 	taskService := service.NewTaskServiceImplementation(taskRepo)
-	// Initialize gRPC server.
-
-	grpcServer := grpcTransport.NewServer()
+	tasksHandler := grpc.NewTasksHandler(taskService)
+	grpcServer := grpcTransport.NewServer(tasksHandler)
 
 	return &App{
 		logger: logger,

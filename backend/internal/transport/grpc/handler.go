@@ -10,14 +10,19 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type TaskHandler struct {
+type TasksHandler struct {
 	pb.UnimplementedTasksServer
 	taskService service.TaskService
 }
 
-func (h *TaskHandler) ListTasks(ctx context.Context, _ *emptypb.Empty) (*pb.ListTasksResponse, error) {
+func NewTasksHandler(taskService service.TaskService) *TasksHandler {
+	return &TasksHandler{taskService: taskService}
+}
+
+func (h *TasksHandler) ListTasks(ctx context.Context, _ *emptypb.Empty) (*pb.ListTasksResponse, error) {
 	tasks, err := h.taskService.List(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("list tasks: %v", err))
@@ -26,7 +31,7 @@ func (h *TaskHandler) ListTasks(ctx context.Context, _ *emptypb.Empty) (*pb.List
 	return &pb.ListTasksResponse{Tasks: toProtoListEntry(tasks)}, nil
 }
 
-func (h *TaskHandler) GetTask(ctx context.Context, r *pb.GetTaskRequest) (*pb.Task, error) {
+func (h *TasksHandler) GetTask(ctx context.Context, r *pb.GetTaskRequest) (*pb.Task, error) {
 	if r.GetId() <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "task id should be set")
 	}
@@ -39,7 +44,7 @@ func (h *TaskHandler) GetTask(ctx context.Context, r *pb.GetTaskRequest) (*pb.Ta
 	return toProtoTask(task), nil
 }
 
-func (h *TaskHandler) CreateTask(ctx context.Context, r *pb.CreateTaskRequest) (*pb.Task, error) {
+func (h *TasksHandler) CreateTask(ctx context.Context, r *pb.CreateTaskRequest) (*pb.Task, error) {
 	if r.GetName() == "" {
 		return nil, status.Error(codes.InvalidArgument, "task name should be set")
 	}
@@ -56,7 +61,7 @@ func (h *TaskHandler) CreateTask(ctx context.Context, r *pb.CreateTaskRequest) (
 	return toProtoTask(task), nil
 }
 
-func (h *TaskHandler) UpdateTask(ctx context.Context, r *pb.UpdateTaskRequest) (*pb.Task, error) {
+func (h *TasksHandler) UpdateTask(ctx context.Context, r *pb.UpdateTaskRequest) (*pb.UpdateTaskResponse, error) {
 	if r.GetTask() == nil {
 		return nil, status.Error(codes.InvalidArgument, "task is required")
 	}
@@ -109,15 +114,15 @@ func (h *TaskHandler) UpdateTask(ctx context.Context, r *pb.UpdateTaskRequest) (
 		}
 	}
 
-	task, err := h.taskService.Update(ctx, params)
+	updatedAt, err := h.taskService.Update(ctx, params)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("partial task update: %v", err))
 	}
 
-	return toProtoTask(task), nil
+	return &pb.UpdateTaskResponse{Id: params.ID, UpdatedAt: timestamppb.New(updatedAt)}, nil
 }
 
-func (h *TaskHandler) DeleteTask(ctx context.Context, r *pb.DeleteTaskRequest) (*emptypb.Empty, error) {
+func (h *TasksHandler) DeleteTask(ctx context.Context, r *pb.DeleteTaskRequest) (*emptypb.Empty, error) {
 	if r.GetId() <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "task id should be set")
 	}
@@ -130,7 +135,7 @@ func (h *TaskHandler) DeleteTask(ctx context.Context, r *pb.DeleteTaskRequest) (
 	return nil, nil
 }
 
-func (h *TaskHandler) MoveTask(ctx context.Context, r *pb.MoveTaskRequest) (*pb.MoveTaskResponse, error) {
+func (h *TasksHandler) MoveTask(ctx context.Context, r *pb.MoveTaskRequest) (*pb.MoveTaskResponse, error) {
 	if r == nil {
 		return nil, status.Error(codes.InvalidArgument, "move task request isn't provided")
 	}

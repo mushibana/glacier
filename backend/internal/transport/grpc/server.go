@@ -3,6 +3,7 @@ package grpc
 import (
 	"net"
 
+	pb "github.com/mushibana/glacier/backend/proto"
 	"google.golang.org/grpc"
 )
 
@@ -10,10 +11,10 @@ type Server struct {
 	server *grpc.Server
 }
 
-func NewServer() *Server {
+func NewServer(tasksHandler *TasksHandler) *Server {
 	server := grpc.NewServer()
 
-	// pb.RegisterTasksServer(server, tasksHandler)
+	pb.RegisterTasksServer(server, tasksHandler)
 
 	return &Server{
 		server: server,
