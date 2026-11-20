@@ -273,9 +273,9 @@ func (r *TaskRepositoryImplementation) Move(ctx context.Context, id int64, befor
 
 	// moved to end of list
 	if before == len(tasks)-1 {
+		// we didn't reorder initial task list so "from" is used
 		tasks[from].OrderNum = tasks[before].OrderNum + domain.OrderNumDefaultSpace
-		slices.SortStableFunc(tasks, sortTasksFn)
-		return tasks, nil
+		return []domain.Task{tasks[from]}, nil
 	}
 
 	to := before + 1
@@ -301,7 +301,7 @@ func (r *TaskRepositoryImplementation) Move(ctx context.Context, id int64, befor
 
 	tasks[to].OrderNum = prevOrderNum + (nextOrderNum-prevOrderNum)/2
 	if prevOrderNum < tasks[to].OrderNum && nextOrderNum < tasks[to].OrderNum {
-		return tasks, nil
+		return []domain.Task{tasks[to]}, nil
 	}
 
 	// branch when integer nums between neighbours are exhausted (new order number is already in use)
